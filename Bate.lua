@@ -1104,40 +1104,39 @@ end)
     end)
 end
 
-    function Elements:Toggle(text, description, default, callback)
-    local ToggleFrame = Instance.new("TextButton")
-    local TogCorner = Instance.new("UICorner")
-    local TogTitle = Instance.new("TextLabel")
-    local TogDesc = Instance.new("TextLabel")
-    local TogBox = Instance.new("Frame")
-    local TogBoxCorner = Instance.new("UICorner")
-    local TogBoxStroke = Instance.new("UIStroke")
-    local Check = Instance.new("Frame")
-    local CheckCorner = Instance.new("UICorner")
-    local viewInfo = Instance.new("ImageLabel")
+    function Elements:Toggle(text, default, callback)
+                local ToggleFrame = Instance.new("TextButton")
+                local TogCorner = Instance.new("UICorner")
+                local TogTitle = Instance.new("TextLabel")
+                local TogBox = Instance.new("Frame")
+                local TogDesc = Instance.new("TextLabel")
+                local TogBoxCorner = Instance.new("UICorner")
+                local TogBoxStroke = Instance.new("UIStroke")
+                local Check = Instance.new("Frame")
+                local CheckCorner = Instance.new("UICorner")
 
-    local toggled = default or false
+                local toggled = default or false
 
-    ToggleFrame.Parent = Page
-    ToggleFrame.BackgroundColor3 = Color_Sec
-    ToggleFrame.Size = UDim2.new(1, 0, 0, 32)
-    ToggleFrame.AutoButtonColor = false
-    ToggleFrame.Text = ""
+                ToggleFrame.Parent = Page
+                ToggleFrame.BackgroundColor3 = Color_Sec
+                ToggleFrame.Size = UDim2.new(1, 0, 0, 32)
+                ToggleFrame.AutoButtonColor = false
+                ToggleFrame.Text = ""
 
-    TogCorner.CornerRadius = UDim.new(0, 6)
-    TogCorner.Parent = ToggleFrame
+                TogCorner.CornerRadius = UDim.new(0, 6)
+                TogCorner.Parent = ToggleFrame
 
-    TogTitle.Parent = ToggleFrame
-    TogTitle.BackgroundTransparency = 1
-    TogTitle.Position = UDim2.new(0, 10, 0, 0)
-    TogTitle.Size = UDim2.new(1, -40, 1, 0)
-    TogTitle.Font = Enum.Font.Code
-    TogTitle.Text = text
-    TogTitle.TextColor3 = Color_Text
-    TogTitle.TextSize = 13
-    TogTitle.TextXAlignment = Enum.TextXAlignment.Left
-
-    if description and description ~= "" then
+                TogTitle.Parent = ToggleFrame
+                TogTitle.BackgroundTransparency = 1
+                TogTitle.Position = UDim2.new(0, 10, 0, 0)
+                TogTitle.Size = UDim2.new(1, -40, 1, 0)
+                TogTitle.Font = Enum.Font.Gotham
+                TogTitle.Text = text
+                TogTitle.TextColor3 = Color_Text
+                TogTitle.TextSize = 13
+                TogTitle.TextXAlignment = Enum.TextXAlignment.Left
+                
+                if description and description ~= "" then
         ToggleFrame.Size = UDim2.new(1, 0, 0, 45)
         TogTitle.Size = UDim2.new(1, -40, 0, 18)
         TogTitle.Position = UDim2.new(0, 10, 0, 4)
@@ -1152,52 +1151,52 @@ end
         TogDesc.TextSize = 11
         TogDesc.TextXAlignment = Enum.TextXAlignment.Left
     end
+                TogBox.Parent = ToggleFrame
+                TogBox.BackgroundColor3 = Color_Main
+                TogBox.Position = UDim2.new(1, -26, 0.5, -9)
+                TogBox.Size = UDim2.new(0, 18, 0, 18)
 
-    TogBox.Parent = ToggleFrame
-    TogBox.BackgroundColor3 = Color_Main
-    TogBox.Position = UDim2.new(1, -26, 0.5, -9)
-    TogBox.Size = UDim2.new(0, 18, 0, 18)
+                TogBoxCorner.CornerRadius = UDim.new(0, 4)
+                TogBoxCorner.Parent = TogBox
 
-    TogBoxCorner.CornerRadius = UDim.new(0, 4)
-    TogBoxCorner.Parent = TogBox
+                TogBoxStroke.Parent = TogBox
+                TogBoxStroke.Thickness = 1
+                TogBoxStroke.Color = Color3.fromRGB(50,50,50)
 
-    TogBoxStroke.Parent = TogBox
-    TogBoxStroke.Thickness = 1
-    TogBoxStroke.Color = Color3.fromRGB(50,50,50)
+                Check.Parent = TogBox
+                Check.BackgroundColor3 = Color_Accent
+                Check.AnchorPoint = Vector2.new(0.5,0.5)
+                Check.Position = UDim2.new(0.5,0,0.5,0)
+                Check.Size = UDim2.new(0, 0, 0, 0)
 
-    Check.Parent = TogBox
-    Check.BackgroundColor3 = Color_Accent
-    Check.AnchorPoint = Vector2.new(0.5,0.5)
-    Check.Position = UDim2.new(0.5,0,0.5,0)
-    Check.Size = UDim2.new(0, 0, 0, 0)
+                CheckCorner.CornerRadius = UDim.new(0, 2)
+                CheckCorner.Parent = Check
 
-    CheckCorner.CornerRadius = UDim.new(0, 2)
-    CheckCorner.Parent = Check
+                if toggled then
+                    Check.Size = UDim2.new(0, 10, 0, 10)
+                    TogBoxStroke.Color = Color_Accent
+                end
 
-    if toggled then
-        Check.Size = UDim2.new(0, 10, 0, 10)
-        TogBoxStroke.Color = Color_Accent
-    end
+                ToggleFrame.MouseEnter:Connect(function()
+                    TweenService:Create(ToggleFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35,35,35)}):Play()
+                end)
+                ToggleFrame.MouseLeave:Connect(function()
+                    TweenService:Create(ToggleFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color_Sec}):Play()
+                end)
 
-    ToggleFrame.MouseEnter:Connect(function()
-        TweenService:Create(ToggleFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35,35,35)}):Play()
-    end)
-    ToggleFrame.MouseLeave:Connect(function()
-        TweenService:Create(ToggleFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color_Sec}):Play()
-    end)
-
-    ToggleFrame.MouseButton1Click:Connect(function()
-        toggled = not toggled
-        if toggled then
-            TweenService:Create(Check, TweenInfo.new(0.2, Enum.EasingStyle.Back), {Size = UDim2.new(0, 10, 0, 10)}):Play()
-            TweenService:Create(TogBoxStroke, TweenInfo.new(0.2), {Color = Color_Accent}):Play()
-        else
-            TweenService:Create(Check, TweenInfo.new(0.2), {Size = UDim2.new(0, 0, 0, 0)}):Play()
-            TweenService:Create(TogBoxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(50,50,50)}):Play()
-        end
-        pcall(callback, toggled)
-    end)
-end
+                ToggleFrame.MouseButton1Click:Connect(function()
+                    toggled = not toggled
+                    if toggled then
+                        TweenService:Create(Check, TweenInfo.new(0.2, Enum.EasingStyle.Back), {Size = UDim2.new(0, 10, 0, 10)}):Play()
+                        TweenService:Create(TogBoxStroke, TweenInfo.new(0.2), {Color = Color_Accent}):Play()
+                    else
+                        TweenService:Create(Check, TweenInfo.new(0.2), {Size = UDim2.new(0, 0, 0, 0)}):Play()
+                        TweenService:Create(TogBoxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(50,50,50)}):Play()
+                    end
+                    pcall(callback, toggled)
+                end)
+            end
+            
             
     function Elements:Discord(data)
     local DiscordFrame = Instance.new("Frame")
