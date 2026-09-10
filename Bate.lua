@@ -1766,48 +1766,77 @@ end
 end
  function Elements:ImageLabel(Configs)
     local LabelImage = Configs.Image or "rbxassetid://0"
-    local StrokeColor = Configs.StrokeColor or Color3.fromRGB(0, 150, 255)
-    local StrokeThickness = Configs.StrokeThickness or 2
+    local CreditsData = Configs.Credits or {
+        "A1er, Owner",
+        "TikTok, iwant_dex",
+        "YouTube, HexHubX",
+        "Roblox, MG_HUB"
+    }
     
-    local ImageLabel = Instance.new("ImageLabel")
-    ImageLabel.Parent = Page
-    ImageLabel.Size = UDim2.new(0, 95, 0, 110)
-    ImageLabel.BackgroundColor3 = Color_Sec
-    ImageLabel.BackgroundTransparency = 1
-    ImageLabel.Image = LabelImage
-    ImageLabel.ScaleType = Enum.ScaleType.Fit
+    local Frame = Instance.new("Frame")
+    Frame.Parent = Page
+    Frame.Size = UDim2.new(0, 260, 0, 110)
+    Frame.BackgroundColor3 = Color_Sec
+    Frame.BackgroundTransparency = 0.4
+    Frame.BorderSizePixel = 0
     
-    local UIStroke = Instance.new("UIStroke")
-    UIStroke.Parent = ImageLabel
-    UIStroke.Color = StrokeColor
-    UIStroke.Thickness = StrokeThickness
-    UIStroke.Transparency = 0
+    local FrameCorner = Instance.new("UICorner")
+    FrameCorner.CornerRadius = UDim.new(0, 6)
+    FrameCorner.Parent = Frame
     
-    local UIGradient = Instance.new("UIGradient")
-    UIGradient.Parent = UIStroke
-    UIGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 100, 200)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 200, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 150, 255))
-    })
-    UIGradient.Rotation = 45
+    local FrameStroke = Instance.new("UIStroke")
+    FrameStroke.Color = Color3.fromRGB(45, 45, 45)
+    FrameStroke.Thickness = 1
+    FrameStroke.Parent = Frame
+    
+    local MainImage = Instance.new("ImageLabel")
+    MainImage.Parent = Frame
+    MainImage.Size = UDim2.new(0, 90, 0, 90)
+    MainImage.Position = UDim2.new(0, 10, 0.5, -45)
+    MainImage.BackgroundTransparency = 1
+    MainImage.Image = LabelImage
+    MainImage.ScaleType = Enum.ScaleType.Crop
+    
+    local ImageCorner = Instance.new("UICorner")
+    ImageCorner.CornerRadius = UDim.new(0, 8)
+    ImageCorner.Parent = MainImage
+    
+    local CreditsList = Instance.new("Frame")
+    CreditsList.Parent = Frame
+    CreditsList.Size = UDim2.new(1, -115, 1, -10)
+    CreditsList.Position = UDim2.new(0, 108, 0, 5)
+    CreditsList.BackgroundTransparency = 1
+    
+    local ListLayout = Instance.new("UIListLayout")
+    ListLayout.Padding = UDim.new(0, 2)
+    ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    ListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    ListLayout.Parent = CreditsList
+    
+    for i, text in ipairs(CreditsData) do
+        local CreditLabel = Instance.new("TextLabel")
+        CreditLabel.Parent = CreditsList
+        CreditLabel.Size = UDim2.new(1, 0, 0, 20)
+        CreditLabel.BackgroundTransparency = 1
+        CreditLabel.LayoutOrder = i
+        CreditLabel.Font = Enum.Font.Gotham
+        CreditLabel.Text = text
+        CreditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        CreditLabel.TextSize = 13
+        CreditLabel.TextXAlignment = Enum.TextXAlignment.Left
+    end
     
     return {
-        Image = ImageLabel,
+        Frame = Frame,
+        Image = MainImage,
         SetImage = function(self, NewImage)
             self.Image.Image = NewImage
         end,
-        SetStrokeColor = function(self, Color)
-            UIStroke.Color = Color
-        end,
-        SetStrokeThickness = function(self, Thickness)
-            UIStroke.Thickness = Thickness
-        end,
         Destroy = function(self)
-            self.Image:Destroy()
+            Frame:Destroy()
         end
     }
-end
+                end
 function Elements:Video(Configs)
     local LabelName = Configs.Name or "Video"
     local VideoLink = Configs.Video or "https://raw.githubusercontent.com/jdkdmdod/hs/refs/heads/main/HexHubX2_vid.webm"
