@@ -1485,12 +1485,12 @@ end
     if isMulti == nil then isMulti = true end
 
     local Selected = {}
-    for _, v in pairs(DefaultSelected) do Selected[v] = true end
+    for _, v in pairs(DefaultSelected) do Selected[tostring(v)] = true end
 
     local Frame = Instance.new("Frame")
     local FrameCorner = Instance.new("UICorner")
     local FrameStroke = Instance.new("UIStroke")
-    
+
     Frame.Parent = Page
     Frame.Size = UDim2.new(1, 0, 0, 25)
     Frame.BackgroundColor3 = Color_Sec
@@ -1548,34 +1548,23 @@ end
     OptionContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     OptionContainer.ScrollBarThickness = 2
     OptionContainer.Visible = false
-    
+
     local Layout = Instance.new("UIListLayout", OptionContainer)
     Layout.Padding = UDim.new(0, 3)
 
-    local function updateLayout()
-        OptionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
-    end
-    Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateLayout)
-
     local OptionButtons = {}
-
-    local function RefreshVisuals()
-        for opt, btn in pairs(OptionButtons) do
-            btn.BackgroundColor3 = Selected[opt] and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(35, 35, 35)
-            btn.TextColor3 = Selected[opt] and Color3.fromRGB(255, 0, 0) or Color_Text
-        end
-    end
 
     local function RefreshOptions()
         for _, btn in pairs(OptionButtons) do btn:Destroy() end
         OptionButtons = {}
 
-        for _, option in pairs(Options) do
+        for _, rawOption in pairs(Options) do
+            local option = tostring(rawOption)
             local OptBtn = Instance.new("TextButton")
             OptBtn.Parent = OptionContainer
             OptBtn.Size = UDim2.new(1, 0, 0, 20)
             OptBtn.BackgroundColor3 = Selected[option] and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(35, 35, 35)
-            OptBtn.Text = "  " .. tostring(option)
+            OptBtn.Text = "  " .. option
             OptBtn.TextColor3 = Selected[option] and Color3.fromRGB(255, 0, 0) or Color_Text
             OptBtn.TextXAlignment = Enum.TextXAlignment.Left
             OptBtn.Font = Enum.Font.Code
@@ -1584,16 +1573,17 @@ end
 
             OptBtn.MouseButton1Click:Connect(function()
                 if not isMulti then
-                    local isAlreadySelected = Selected[option]
+                    local was = Selected[option]
                     Selected = {}
-                    if not isAlreadySelected then
-                        Selected[option] = true
-                    end
+                    if not was then Selected[option] = true end
                 else
                     Selected[option] = not Selected[option]
                 end
 
-                RefreshVisuals()
+                for opt, btn in pairs(OptionButtons) do
+                    btn.BackgroundColor3 = Selected[opt] and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(35, 35, 35)
+                    btn.TextColor3 = Selected[opt] and Color3.fromRGB(255, 0, 0) or Color_Text
+                end
 
                 local tbl = {}
                 for k, v in pairs(Selected) do if v then table.insert(tbl, k) end end
@@ -1602,16 +1592,18 @@ end
 
             OptionButtons[option] = OptBtn
         end
+
+        OptionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
     end
+
+    Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        OptionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
+    end)
 
     SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
         local text = SearchBox.Text:lower()
         for opt, btn in pairs(OptionButtons) do
-            if text == "" or opt:lower():find(text) then
-                btn.Visible = true
-            else
-                btn.Visible = false
-            end
+            btn.Visible = (text == "" or opt:lower():find(text, 1, true)) and true or false
         end
     end)
 
@@ -1641,22 +1633,17 @@ end
             for k, v in pairs(Selected) do if v then table.insert(tbl, k) end end
             return tbl
         end,
-        Update = function(NewOptions, NewDefault)
-            Options = NewOptions or {}
+        Update = function(self, NewOptions, NewDefault)
+            Options = NewOptions or Options
             Selected = {}
             if NewDefault then
-                for _, v in pairs(NewDefault) do Selected[v] = true end
+                for _, v in pairs(NewDefault) do Selected[tostring(v)] = true end
             end
             SearchBox.Text = ""
             RefreshOptions()
-            
-            local tbl = {}
-            for k, v in pairs(Selected) do if v then table.insert(tbl, k) end end
-            pcall(Callback, tbl)
         end
     }
 end
-
 function Elements:Tooltip(TargetFrame, Text)
     local TooltipFrame = Instance.new("Frame")
     local TooltipCorner = Instance.new("UICorner")
@@ -1766,77 +1753,48 @@ end
 end
  function Elements:ImageLabel(Configs)
     local LabelImage = Configs.Image or "rbxassetid://0"
-    local CreditsData = Configs.Credits or {
-        "A1er, Owner",
-        "TikTok, iwant_dex",
-        "YouTube, HexHubX",
-        "Roblox, MG_HUB"
-    }
+    local StrokeColor = Configs.StrokeColor or Color3.fromRGB(0, 150, 255)
+    local StrokeThickness = Configs.StrokeThickness or 2
     
-    local Frame = Instance.new("Frame")
-    Frame.Parent = Page
-    Frame.Size = UDim2.new(0, 260, 0, 110)
-    Frame.BackgroundColor3 = Color_Sec
-    Frame.BackgroundTransparency = 0.4
-    Frame.BorderSizePixel = 0
+    local ImageLabel = Instance.new("ImageLabel")
+    ImageLabel.Parent = Page
+    ImageLabel.Size = UDim2.new(0, 95, 0, 110)
+    ImageLabel.BackgroundColor3 = Color_Sec
+    ImageLabel.BackgroundTransparency = 1
+    ImageLabel.Image = LabelImage
+    ImageLabel.ScaleType = Enum.ScaleType.Fit
     
-    local FrameCorner = Instance.new("UICorner")
-    FrameCorner.CornerRadius = UDim.new(0, 6)
-    FrameCorner.Parent = Frame
+    local UIStroke = Instance.new("UIStroke")
+    UIStroke.Parent = ImageLabel
+    UIStroke.Color = StrokeColor
+    UIStroke.Thickness = StrokeThickness
+    UIStroke.Transparency = 0
     
-    local FrameStroke = Instance.new("UIStroke")
-    FrameStroke.Color = Color3.fromRGB(45, 45, 45)
-    FrameStroke.Thickness = 1
-    FrameStroke.Parent = Frame
-    
-    local MainImage = Instance.new("ImageLabel")
-    MainImage.Parent = Frame
-    MainImage.Size = UDim2.new(0, 90, 0, 90)
-    MainImage.Position = UDim2.new(0, 10, 0.5, -45)
-    MainImage.BackgroundTransparency = 1
-    MainImage.Image = LabelImage
-    MainImage.ScaleType = Enum.ScaleType.Crop
-    
-    local ImageCorner = Instance.new("UICorner")
-    ImageCorner.CornerRadius = UDim.new(0, 8)
-    ImageCorner.Parent = MainImage
-    
-    local CreditsList = Instance.new("Frame")
-    CreditsList.Parent = Frame
-    CreditsList.Size = UDim2.new(1, -115, 1, -10)
-    CreditsList.Position = UDim2.new(0, 108, 0, 5)
-    CreditsList.BackgroundTransparency = 1
-    
-    local ListLayout = Instance.new("UIListLayout")
-    ListLayout.Padding = UDim.new(0, 2)
-    ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    ListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-    ListLayout.Parent = CreditsList
-    
-    for i, text in ipairs(CreditsData) do
-        local CreditLabel = Instance.new("TextLabel")
-        CreditLabel.Parent = CreditsList
-        CreditLabel.Size = UDim2.new(1, 0, 0, 20)
-        CreditLabel.BackgroundTransparency = 1
-        CreditLabel.LayoutOrder = i
-        CreditLabel.Font = Enum.Font.Gotham
-        CreditLabel.Text = text
-        CreditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        CreditLabel.TextSize = 13
-        CreditLabel.TextXAlignment = Enum.TextXAlignment.Left
-    end
+    local UIGradient = Instance.new("UIGradient")
+    UIGradient.Parent = UIStroke
+    UIGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 100, 200)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 200, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 150, 255))
+    })
+    UIGradient.Rotation = 45
     
     return {
-        Frame = Frame,
-        Image = MainImage,
+        Image = ImageLabel,
         SetImage = function(self, NewImage)
             self.Image.Image = NewImage
         end,
+        SetStrokeColor = function(self, Color)
+            UIStroke.Color = Color
+        end,
+        SetStrokeThickness = function(self, Thickness)
+            UIStroke.Thickness = Thickness
+        end,
         Destroy = function(self)
-            Frame:Destroy()
+            self.Image:Destroy()
         end
     }
-                end
+end
 function Elements:Video(Configs)
     local LabelName = Configs.Name or "Video"
     local VideoLink = Configs.Video or "https://raw.githubusercontent.com/jdkdmdod/hs/refs/heads/main/HexHubX2_vid.webm"
