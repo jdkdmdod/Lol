@@ -27,6 +27,12 @@ local Library = (function()
     Options = Color3.fromRGB(25, 25, 25),
     Stroke = Color3.fromRGB(255, 5, 5)
 },
+
+    ["Halloween"] = {
+    Hub = Color3.fromRGB(15, 15, 15),
+    Options = Color3.fromRGB(25, 25, 25),
+    Stroke = Color3.fromRGB(255, 117, 24)
+    }, 
     ["Blue"] = {
         Hub = Color3.fromRGB(10, 15, 40),
         Options = Color3.fromRGB(15, 25, 60),
@@ -1148,6 +1154,15 @@ end)
 end
 
     function Elements:Toggle(text, description, default, callback)
+    if type(description) == "boolean" then
+        callback = default
+        default = description
+        description = ""
+    end
+
+    default = default or false
+    callback = callback or function() end
+
     local ToggleFrame = Instance.new("TextButton")
     local TogCorner = Instance.new("UICorner")
     local TogTitle = Instance.new("TextLabel")
@@ -1158,7 +1173,7 @@ end
     local Check = Instance.new("Frame")
     local CheckCorner = Instance.new("UICorner")
 
-    local toggled = default or false
+    local toggled = default
 
     ToggleFrame.Parent = Page
     ToggleFrame.BackgroundColor3 = Color_Sec
@@ -1225,31 +1240,52 @@ end
     end
 
     ToggleFrame.MouseEnter:Connect(function()
-        TweenService:Create(ToggleFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
+        TweenService:Create(ToggleFrame, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        }):Play()
     end)
+
     ToggleFrame.MouseLeave:Connect(function()
-        TweenService:Create(ToggleFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color_Sec}):Play()
+        TweenService:Create(ToggleFrame, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color_Sec
+        }):Play()
     end)
 
     ToggleFrame.MouseButton1Click:Connect(function()
         toggled = not toggled
+
         if toggled then
             TweenService:Create(Check, TweenInfo.new(0.2, Enum.EasingStyle.Quint), {
                 Position = UDim2.new(0, 21, 0.5, 0),
                 BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             }):Play()
-            TweenService:Create(TogBox, TweenInfo.new(0.2), {BackgroundColor3 = Color_Accent}):Play()
-            TweenService:Create(TogBoxStroke, TweenInfo.new(0.2), {Color = Color_Accent}):Play()
+
+            TweenService:Create(TogBox, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color_Accent
+            }):Play()
+
+            TweenService:Create(TogBoxStroke, TweenInfo.new(0.2), {
+                Color = Color_Accent
+            }):Play()
         else
             TweenService:Create(Check, TweenInfo.new(0.2, Enum.EasingStyle.Quint), {
                 Position = UDim2.new(0, 9, 0.5, 0),
                 BackgroundColor3 = Color3.fromRGB(180, 180, 180)
             }):Play()
-            TweenService:Create(TogBox, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play()
-            TweenService:Create(TogBoxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(60, 60, 60)}):Play()
+
+            TweenService:Create(TogBox, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            }):Play()
+
+            TweenService:Create(TogBoxStroke, TweenInfo.new(0.2), {
+                Color = Color3.fromRGB(60, 60, 60)
+            }):Play()
         end
+
         pcall(callback, toggled)
     end)
+
+    pcall(callback, toggled)
 end
             
     function Elements:Discord(data)
