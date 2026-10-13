@@ -1575,12 +1575,12 @@ end
     if isMulti == nil then isMulti = true end
 
     local Selected = {}
-    for _, v in pairs(DefaultSelected) do Selected[v] = true end
+    for _, v in pairs(DefaultSelected) do Selected[tostring(v)] = true end
 
     local Frame = Instance.new("Frame")
     local FrameCorner = Instance.new("UICorner")
     local FrameStroke = Instance.new("UIStroke")
-    
+
     Frame.Parent = Page
     Frame.Size = UDim2.new(1, 0, 0, 25)
     Frame.BackgroundColor3 = Color_Sec
@@ -1638,34 +1638,23 @@ end
     OptionContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     OptionContainer.ScrollBarThickness = 2
     OptionContainer.Visible = false
-    
+
     local Layout = Instance.new("UIListLayout", OptionContainer)
     Layout.Padding = UDim.new(0, 3)
 
-    local function updateLayout()
-        OptionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
-    end
-    Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateLayout)
-
     local OptionButtons = {}
-
-    local function RefreshVisuals()
-        for opt, btn in pairs(OptionButtons) do
-            btn.BackgroundColor3 = Selected[opt] and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(35, 35, 35)
-            btn.TextColor3 = Selected[opt] and Color3.fromRGB(255, 0, 0) or Color_Text
-        end
-    end
 
     local function RefreshOptions()
         for _, btn in pairs(OptionButtons) do btn:Destroy() end
         OptionButtons = {}
 
-        for _, option in pairs(Options) do
+        for _, rawOption in pairs(Options) do
+            local option = tostring(rawOption)
             local OptBtn = Instance.new("TextButton")
             OptBtn.Parent = OptionContainer
             OptBtn.Size = UDim2.new(1, 0, 0, 20)
             OptBtn.BackgroundColor3 = Selected[option] and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(35, 35, 35)
-            OptBtn.Text = "  " .. tostring(option)
+            OptBtn.Text = "  " .. option
             OptBtn.TextColor3 = Selected[option] and Color3.fromRGB(255, 0, 0) or Color_Text
             OptBtn.TextXAlignment = Enum.TextXAlignment.Left
             OptBtn.Font = Enum.Font.Code
@@ -1674,16 +1663,17 @@ end
 
             OptBtn.MouseButton1Click:Connect(function()
                 if not isMulti then
-                    local isAlreadySelected = Selected[option]
+                    local was = Selected[option]
                     Selected = {}
-                    if not isAlreadySelected then
-                        Selected[option] = true
-                    end
+                    if not was then Selected[option] = true end
                 else
                     Selected[option] = not Selected[option]
                 end
 
-                RefreshVisuals()
+                for opt, btn in pairs(OptionButtons) do
+                    btn.BackgroundColor3 = Selected[opt] and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(35, 35, 35)
+                    btn.TextColor3 = Selected[opt] and Color3.fromRGB(255, 0, 0) or Color_Text
+                end
 
                 local tbl = {}
                 for k, v in pairs(Selected) do if v then table.insert(tbl, k) end end
@@ -1692,16 +1682,18 @@ end
 
             OptionButtons[option] = OptBtn
         end
+
+        OptionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
     end
+
+    Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        OptionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
+    end)
 
     SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
         local text = SearchBox.Text:lower()
         for opt, btn in pairs(OptionButtons) do
-            if text == "" or opt:lower():find(text) then
-                btn.Visible = true
-            else
-                btn.Visible = false
-            end
+            btn.Visible = (text == "" or opt:lower():find(text, 1, true)) and true or false
         end
     end)
 
@@ -1731,22 +1723,17 @@ end
             for k, v in pairs(Selected) do if v then table.insert(tbl, k) end end
             return tbl
         end,
-        Update = function(NewOptions, NewDefault)
-            Options = NewOptions or {}
+        Update = function(self, NewOptions, NewDefault)
+            Options = NewOptions or Options
             Selected = {}
             if NewDefault then
-                for _, v in pairs(NewDefault) do Selected[v] = true end
+                for _, v in pairs(NewDefault) do Selected[tostring(v)] = true end
             end
             SearchBox.Text = ""
             RefreshOptions()
-            
-            local tbl = {}
-            for k, v in pairs(Selected) do if v then table.insert(tbl, k) end end
-            pcall(Callback, tbl)
         end
     }
 end
-
 function Elements:Tooltip(TargetFrame, Text)
     local TooltipFrame = Instance.new("Frame")
     local TooltipCorner = Instance.new("UICorner")
