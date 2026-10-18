@@ -4,6 +4,7 @@ local Library = (function()
             game:GetService('CoreGui'):FindFirstChild('HexHubX'):Destroy()
         end
     end)
+
     local TweenService = game:GetService("TweenService")
     local UserInputService = game:GetService("UserInputService")
     local HttpService = game:GetService("HttpService")
@@ -16,6 +17,32 @@ local Library = (function()
     local CoreGui = game:GetService("CoreGui")
     
     local Lib = {}
+    
+    local ConfigFolder = "HexHub_Configs"
+    local ConfigFile = ConfigFolder .. "/Config.json"
+    
+    if not isfolder(ConfigFolder) then
+        makefolder(ConfigFolder)
+    end
+
+    getgenv().HexHubConfig = {}
+    if isfile(ConfigFile) then
+        local success, result = pcall(function()
+            return HttpService:JSONDecode(readfile(ConfigFile))
+        end)
+        if success and type(result) == "table" then
+            getgenv().HexHubConfig = result
+        end
+    end
+
+    local function SaveConfig()
+        local success, result = pcall(function()
+            return HttpService:JSONEncode(getgenv().HexHubConfig)
+        end)
+        if success then
+            writefile(ConfigFile, result)
+        end
+    end
     local Colors = {
     ["Black"] = {
         Hub = Color3.fromRGB(15, 15, 15),
@@ -27,12 +54,11 @@ local Library = (function()
     Options = Color3.fromRGB(25, 25, 25),
     Stroke = Color3.fromRGB(255, 5, 5)
 },
-
     ["Halloween"] = {
-    Hub = Color3.fromRGB(15, 15, 15),
+    Hub = Color3.fromRGB(10, 10, 10),
     Options = Color3.fromRGB(25, 25, 25),
     Stroke = Color3.fromRGB(255, 117, 24)
-    }, 
+},
     ["Blue"] = {
         Hub = Color3.fromRGB(10, 15, 40),
         Options = Color3.fromRGB(15, 25, 60),
@@ -130,7 +156,7 @@ local Library = (function()
     }
 }
 
-    local CurrentTheme = Colors["Red"]
+    local CurrentTheme = Colors["Halloween"]
 
     function Lib:ApplyColor(colorName)
         local color = Colors[colorName]
@@ -227,7 +253,7 @@ local Library = (function()
         TextLabel.Parent = Frame2
 
         local TextButton = Instance.new("TextButton")
-        TextButton.Text = "X"
+        TextButton.Text = "-"
         TextButton.Font = Enum.Font.FredokaOne
         TextButton.TextSize = 20
         TextButton.BackgroundTransparency = 1
@@ -302,7 +328,7 @@ local Library = (function()
 
 function Lib:Window(Configs)
 local title = Configs.Hub.Title or "HexHubX"
-local customTag = Configs.Hub.UserTag or "Premium User"
+local customTag = Configs.Hub.UserTag or "Hello User"
 
 local KeySystem = Configs.Key.KeySystem or false
 local KeyTitle = Configs.Key.Title or "Key System"
@@ -523,9 +549,9 @@ ToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
 ToggleGradient.Parent = ToggleStroke
 ToggleGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 117, 24)),
+ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
+ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 117, 24))
 })
 ToggleGradient.Rotation = 45
 
@@ -572,9 +598,9 @@ MainStroke.Transparency = 1
 
 MainGradient.Parent = MainStroke
 MainGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 117, 24)),
+ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
+ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 117, 24))
 })
 MainGradient.Rotation = 45
 
@@ -712,6 +738,30 @@ end)
             end
         end
     end)
+    
+local TimePlayedLabel = Instance.new("TextLabel")
+TimePlayedLabel.Name = "TimePlayedLabel"
+TimePlayedLabel.Parent = Top
+TimePlayedLabel.Size = UDim2.new(1, 0, 0, 30)
+TimePlayedLabel.Position = UDim2.new(1, -270, 0, 0)
+TimePlayedLabel.BackgroundTransparency = 1
+TimePlayedLabel.Font = Enum.Font.Code
+TimePlayedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TimePlayedLabel.TextSize = 20
+TimePlayedLabel.TextXAlignment = Enum.TextXAlignment.Left
+TimePlayedLabel.Text = "00:00"
+
+local startTime = tick()
+task.spawn(function()
+    while ScreenGui.Parent do
+        local elapsed = math.floor(tick() - startTime)
+        local minutes = math.floor(elapsed / 60)
+        local seconds = elapsed % 60
+        TimePlayedLabel.Text = string.format("%02d:%02d", minutes, seconds)
+        task.wait(1)
+    end
+end)
+--[[
 local DiscordTopBtn = Instance.new("ImageButton")
 DiscordTopBtn.Name = "DiscordTopBtn"
 DiscordTopBtn.Image = "rbxassetid://12058969086"
@@ -757,12 +807,13 @@ TelegramTopBtn.MouseButton1Click:Connect(function()
         Time = 5
     })
 end)
+]] 
         CloseBtn.Parent = Top
         CloseBtn.BackgroundTransparency = 1
         CloseBtn.Position = UDim2.new(1, -30, 0, 0)
         CloseBtn.Size = UDim2.new(0, 30, 1, 0)
         CloseBtn.Font = Enum.Font.Code
-        CloseBtn.Text = "X"
+        CloseBtn.Text = "-"
         CloseBtn.TextColor3 = Color_TextDim
         CloseBtn.TextSize = 14
         
@@ -912,159 +963,214 @@ end)
                 isResizing = false
             end
         end)
-        local TabHandler = {}
-        local FirstTab = true
+        
+        local SearchFrame = Instance.new("Frame")
+SearchFrame.Name = "SearchFrame"
+SearchFrame.Parent = TabsFrame
+SearchFrame.BackgroundColor3 = Color_Sec
+SearchFrame.BorderSizePixel = 0
+SearchFrame.Position = UDim2.new(0, 5, 0, 5)
+SearchFrame.Size = UDim2.new(1, -10, 0, 25)
 
-    function TabHandler:Tab(text, TabTitle)
-    local TabName = text or "Tab"
-    local ShowTitle = TabTitle or false
+local SearchCorner = Instance.new("UICorner")
+SearchCorner.CornerRadius = UDim.new(0, 6)
+SearchCorner.Parent = SearchFrame
 
-    local Frame = Instance.new("Frame")
-    Frame.Name = TabName .. "_Tab"
-    Frame.Parent = TabsContainer
-    Frame.Size = UDim2.new(1, -20, 0, 28)
-    Frame.BackgroundTransparency = 1
-    Frame.BorderSizePixel = 0
+local SearchBox = Instance.new("TextBox")
+SearchBox.Name = "SearchBox"
+SearchBox.Parent = SearchFrame
+SearchBox.BackgroundTransparency = 1
+SearchBox.Size = UDim2.new(1, -10, 1, 0)
+SearchBox.Position = UDim2.new(0, 5, 0, 0)
+SearchBox.Font = Enum.Font.Code
+SearchBox.PlaceholderText = "Search Tab..."
+SearchBox.Text = ""
+SearchBox.TextColor3 = Color_Text
+SearchBox.PlaceholderColor3 = Color_TextDim
+SearchBox.TextSize = 12
+SearchBox.TextXAlignment = Enum.TextXAlignment.Left
+SearchBox.ClearTextOnFocus = false
 
-    local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 6)
-    Corner.Parent = Frame
+TabsContainer.Position = UDim2.new(0, 0, 0, 30)
+TabsContainer.Size = UDim2.new(1, 0, 1, -85)
+local TabHandler = {}
+local FirstTab = true
+local AllTabs = {}
 
-    local Stroke = Instance.new("UIStroke")
-    Stroke.Thickness = 1
-    Stroke.Transparency = 1
-    Stroke.Color = Color_Accent
-    Stroke.Parent = Frame
+function TabHandler:Tab(text, TabTitle, Icon)
+	local TabName = text or "Tab"
+	local ShowTitle = TabTitle or false
+	local TabIcon = Icon
 
-    local TextButton = Instance.new("TextButton")
-    TextButton.Name = "Button"
-    TextButton.Parent = Frame
-    TextButton.Size = UDim2.new(1, 0, 1, 0)
-    TextButton.BackgroundTransparency = 1
-    TextButton.BorderSizePixel = 0
-    TextButton.Text = ""
-    TextButton.AutoButtonColor = false
-    TextButton.ZIndex = 2
+	local Frame = Instance.new("Frame")
+	Frame.Name = TabName .. "_Tab"
+	Frame.Parent = TabsContainer
+	Frame.Size = UDim2.new(1, -20, 0, 28)
+	Frame.BackgroundTransparency = 1
+	Frame.BorderSizePixel = 0
 
-    local TextLabel = Instance.new("TextLabel")
-    TextLabel.Name = "TextLabel"
-    TextLabel.Parent = Frame
-    TextLabel.Size = UDim2.new(1, 0, 1, 0)
-    TextLabel.BackgroundTransparency = 1
-    TextLabel.BorderSizePixel = 0
-    TextLabel.Font = Enum.Font.Code
-    TextLabel.Text = TabName
-    TextLabel.TextColor3 = Color_TextDim
-    TextLabel.TextSize = 14
-    TextLabel.TextXAlignment = Enum.TextXAlignment.Center
-    TextLabel.TextYAlignment = Enum.TextYAlignment.Center
-    TextLabel.ZIndex = 3
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(0, 6)
+	Corner.Parent = Frame
 
-    local Page = Instance.new("ScrollingFrame")
-    local PageList = Instance.new("UIListLayout")
-    local PagePad = Instance.new("UIPadding")
+	local Stroke = Instance.new("UIStroke")
+	Stroke.Thickness = 1
+	Stroke.Transparency = 1
+	Stroke.Color = Color_Accent
+	Stroke.Parent = Frame
 
-    Page.Name = TabName .. "_Page"
-    Page.Parent = PagesFrame
-    Page.BackgroundTransparency = 1
-    Page.BorderSizePixel = 0
-    Page.Size = UDim2.new(1, 0, 1, 0)
-    Page.ScrollBarThickness = 2
-    Page.ScrollBarImageColor3 = Color_Accent
-    Page.ScrollingDirection = Enum.ScrollingDirection.Y
-    Page.CanvasSize = UDim2.new(0, 0, 0, 0)
-    Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    Page.Visible = false
+	local TextButton = Instance.new("TextButton")
+	TextButton.Name = "Button"
+	TextButton.Parent = Frame
+	TextButton.Size = UDim2.new(1, 0, 1, 0)
+	TextButton.BackgroundTransparency = 1
+	TextButton.BorderSizePixel = 0
+	TextButton.Text = ""
+	TextButton.AutoButtonColor = false
+	TextButton.ZIndex = 2
 
-    PageList.Parent = Page
-    PageList.SortOrder = Enum.SortOrder.LayoutOrder
-    PageList.Padding = UDim.new(0, 6)
+	local IconLabel = Instance.new("ImageLabel")
+	IconLabel.Name = "ImageLabel"
+	IconLabel.Parent = Frame
+	IconLabel.BackgroundTransparency = 1
+	IconLabel.BorderSizePixel = 0
+	IconLabel.Size = UDim2.new(0, 14, 0, 14)
+	IconLabel.Position = UDim2.new(0, 10, 0.5, -7)
+	IconLabel.ImageColor3 = Color_TextDim
+	IconLabel.ScaleType = Enum.ScaleType.Fit
+	IconLabel.ZIndex = 3
+	IconLabel.Visible = false
 
-    PagePad.Parent = Page
-    PagePad.PaddingLeft = UDim.new(0, 10)
-    PagePad.PaddingRight = UDim.new(0, 10)
-    PagePad.PaddingTop = UDim.new(0, 10)
-    PagePad.PaddingBottom = UDim.new(0, 10)
+	local TextLabel = Instance.new("TextLabel")
+	TextLabel.Name = "TextLabel"
+	TextLabel.Parent = Frame
+	TextLabel.Size = UDim2.new(1, 0, 1, 0)
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.BorderSizePixel = 0
+	TextLabel.Font = Enum.Font.Code
+	TextLabel.Text = TabName
+	TextLabel.TextColor3 = Color_TextDim
+	TextLabel.TextSize = 14
+	TextLabel.TextXAlignment = Enum.TextXAlignment.Center
+	TextLabel.TextYAlignment = Enum.TextYAlignment.Center
+	TextLabel.ZIndex = 3
 
-    if ShowTitle then
-        local Title = Instance.new("TextLabel")
-        Title.Name = "Frame"
-        Title.Parent = Page
-        Title.BackgroundTransparency = 1
-        Title.Size = UDim2.new(1, 0, 0, 30)
-        Title.Font = Enum.Font.Code
-        Title.Text = "#" .. string.gsub(TabName, " ", "-")
-        Title.TextColor3 = Color_Text
-        Title.TextSize = 25
-        Title.TextXAlignment = Enum.TextXAlignment.Left
-        Title.LayoutOrder = -999
-    end
+	if TabIcon and TabIcon ~= "" then
+		local iconStr = tostring(TabIcon)
+		if iconStr:match("^%d+$") then
+			IconLabel.Image = "rbxassetid://" .. iconStr
+		else
+			IconLabel.Image = iconStr
+		end
+		IconLabel.Visible = true
+		TextLabel.Position = UDim2.new(0, 29, 0, 0)
+		TextLabel.Size = UDim2.new(1, -32, 1, 0)
+		TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+	else
+		IconLabel.Visible = false
+		TextLabel.Position = UDim2.new(0, 0, 0, 0)
+		TextLabel.Size = UDim2.new(1, 0, 1, 0)
+		TextLabel.TextXAlignment = Enum.TextXAlignment.Center
+	end
 
-    local function Activate()
-        for _, container in pairs(PagesFrame:GetChildren()) do
-            if container:IsA("ScrollingFrame") then
-                container.Visible = false
-            end
+	local Page = Instance.new("ScrollingFrame")
+	local PageList = Instance.new("UIListLayout")
+	local PagePad = Instance.new("UIPadding")
+
+	Page.Name = TabName .. "_Page"
+	Page.Parent = PagesFrame
+	Page.BackgroundTransparency = 1
+	Page.BorderSizePixel = 0
+	Page.Size = UDim2.new(1, 0, 1, 0)
+	Page.ScrollBarThickness = 2
+	Page.ScrollBarImageColor3 = Color_Accent
+	Page.ScrollingDirection = Enum.ScrollingDirection.Y
+	Page.CanvasSize = UDim2.new(0, 0, 0, 0)
+	Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	Page.Visible = false
+
+	PageList.Parent = Page
+	PageList.SortOrder = Enum.SortOrder.LayoutOrder
+	PageList.Padding = UDim.new(0, 6)
+
+	PagePad.Parent = Page
+	PagePad.PaddingLeft = UDim.new(0, 10)
+	PagePad.PaddingRight = UDim.new(0, 10)
+	PagePad.PaddingTop = UDim.new(0, 10)
+	PagePad.PaddingBottom = UDim.new(0, 10)
+
+	if ShowTitle == true then
+		local Title = Instance.new("TextLabel")
+		Title.Name = "Frame"
+		Title.Parent = Page
+		Title.BackgroundTransparency = 1
+		Title.Size = UDim2.new(0, 0, 0)
+		Title.Font = Enum.Font.Code
+		Title.Text = "" .. string.gsub(TabName, " ", "-")
+		Title.TextColor3 = Color_Text
+		Title.TextSize = 0
+		Title.TextXAlignment = Enum.TextXAlignment.Left
+		Title.LayoutOrder = -999
+	end
+
+	table.insert(AllTabs, {Frame = Frame, Name = string.lower(TabName)})
+
+	local function Activate()
+		for _, container in pairs(PagesFrame:GetChildren()) do
+			if container:IsA("ScrollingFrame") then
+				container.Visible = false
+			end
+		end
+
+		for _, frame in pairs(TabsContainer:GetChildren()) do
+			if frame:IsA("Frame") then
+				local label = frame:FindFirstChild("TextLabel")
+				local icon = frame:FindFirstChild("ImageLabel")
+
+				if label then
+					TweenService:Create(label, TweenInfo.new(0.3), {TextColor3 = Color_TextDim}):Play()
+					label.TextSize = 14
+				end
+
+				if icon then
+					TweenService:Create(icon, TweenInfo.new(0.3), {ImageColor3 = Color_TextDim}):Play()
+				end
+
+				local stroke = frame:FindFirstChildOfClass("UIStroke")
+
+				if stroke then
+					TweenService:Create(stroke, TweenInfo.new(0.3), {Transparency = 1}):Play()
+				end
+
+				frame.BackgroundTransparency = 1
+			end
+		end
+
+		Page.Visible = true
+
+		TweenService:Create(TextLabel, TweenInfo.new(0.3), {TextColor3 = Color_Accent}):Play()
+		TextLabel.TextSize = 15
+		TweenService:Create(IconLabel, TweenInfo.new(0.3), {ImageColor3 = Color_Accent}):Play()
+		TweenService:Create(Frame, TweenInfo.new(0.3), {BackgroundTransparency = 0.85}):Play()
+		TweenService:Create(Stroke, TweenInfo.new(0.3), {Transparency = 0.4}):Play()
+	end
+
+	TextButton.MouseButton1Click:Connect(Activate)
+
+	if FirstTab then
+		FirstTab = false
+		Activate()
+	end
+SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local searchText = string.lower(SearchBox.Text)
+    for _, tabData in pairs(AllTabs) do
+        if searchText == "" or string.find(tabData.Name, searchText) then
+            tabData.Frame.Visible = true
+        else
+            tabData.Frame.Visible = false
         end
-
-        for _, frame in pairs(TabsContainer:GetChildren()) do
-            if frame:IsA("Frame") then
-                local label = frame:FindFirstChild("TextLabel")
-
-                if label then
-                    TweenService:Create(
-                        label,
-                        TweenInfo.new(0.3),
-                        {TextColor3 = Color_TextDim}
-                    ):Play()
-
-                    label.TextSize = 14
-                end
-
-                local stroke = frame:FindFirstChildOfClass("UIStroke")
-
-                if stroke then
-                    TweenService:Create(
-                        stroke,
-                        TweenInfo.new(0.3),
-                        {Transparency = 1}
-                    ):Play()
-                end
-
-                frame.BackgroundTransparency = 1
-            end
-        end
-
-        Page.Visible = true
-
-        TweenService:Create(
-            TextLabel,
-            TweenInfo.new(0.3),
-            {TextColor3 = Color_Accent}
-        ):Play()
-
-        TextLabel.TextSize = 15
-
-        TweenService:Create(
-            Frame,
-            TweenInfo.new(0.3),
-            {BackgroundTransparency = 0.85}
-        ):Play()
-
-        TweenService:Create(
-            Stroke,
-            TweenInfo.new(0.3),
-            {Transparency = 0.4}
-        ):Play()
     end
-
-    TextButton.MouseButton1Click:Connect(Activate)
-
-    if FirstTab then
-        FirstTab = false
-        Activate()
-    end
-
+end)
     local Elements = {}
     function Elements:Button(text, description, callback)
     if type(description) == "function" then
@@ -1147,13 +1253,22 @@ end)
     end)
 
     ButtonFrame.Activated:Connect(function()
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://116902184912832"
+        sound.Volume = 0.5
+        sound.Parent = game:GetService("SoundService")
+        sound:Play()
+        sound.Ended:Connect(function()
+            sound:Destroy()
+        end)
+
         if type(callback) == "function" then
             task.spawn(callback)
         end
     end)
 end
 
-    function Elements:Toggle(text, description, default, callback)
+function Elements:Toggle(text, description, default, callback)
     if type(description) == "boolean" then
         callback = default
         default = description
@@ -1254,6 +1369,15 @@ end
     ToggleFrame.MouseButton1Click:Connect(function()
         toggled = not toggled
 
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://116902184912832"
+        sound.Volume = 0.5
+        sound.Parent = game:GetService("SoundService")
+        sound:Play()
+        sound.Ended:Connect(function()
+            sound:Destroy()
+        end)
+
         if toggled then
             TweenService:Create(Check, TweenInfo.new(0.2, Enum.EasingStyle.Quint), {
                 Position = UDim2.new(0, 21, 0.5, 0),
@@ -1281,7 +1405,9 @@ end
                 Color = Color3.fromRGB(60, 60, 60)
             }):Play()
         end
-
+        
+        getgenv().HexHubConfig[text] = toggled
+            SaveConfig()
         pcall(callback, toggled)
     end)
 
@@ -1575,12 +1701,12 @@ end
     if isMulti == nil then isMulti = true end
 
     local Selected = {}
-    for _, v in pairs(DefaultSelected) do Selected[tostring(v)] = true end
+    for _, v in pairs(DefaultSelected) do Selected[v] = true end
 
     local Frame = Instance.new("Frame")
     local FrameCorner = Instance.new("UICorner")
     local FrameStroke = Instance.new("UIStroke")
-
+    
     Frame.Parent = Page
     Frame.Size = UDim2.new(1, 0, 0, 25)
     Frame.BackgroundColor3 = Color_Sec
@@ -1638,24 +1764,35 @@ end
     OptionContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     OptionContainer.ScrollBarThickness = 2
     OptionContainer.Visible = false
-
+    
     local Layout = Instance.new("UIListLayout", OptionContainer)
     Layout.Padding = UDim.new(0, 3)
 
+    local function updateLayout()
+        OptionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
+    end
+    Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateLayout)
+
     local OptionButtons = {}
+
+    local function RefreshVisuals()
+        for opt, btn in pairs(OptionButtons) do
+            btn.BackgroundColor3 = Selected[opt] and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(35, 35, 35)
+            btn.TextColor3 = Selected[opt] and Color3.fromRGB(255, 177, 24) or Color_Text
+        end
+    end
 
     local function RefreshOptions()
         for _, btn in pairs(OptionButtons) do btn:Destroy() end
         OptionButtons = {}
 
-        for _, rawOption in pairs(Options) do
-            local option = tostring(rawOption)
+        for _, option in pairs(Options) do
             local OptBtn = Instance.new("TextButton")
             OptBtn.Parent = OptionContainer
             OptBtn.Size = UDim2.new(1, 0, 0, 20)
             OptBtn.BackgroundColor3 = Selected[option] and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(35, 35, 35)
-            OptBtn.Text = "  " .. option
-            OptBtn.TextColor3 = Selected[option] and Color3.fromRGB(255, 0, 0) or Color_Text
+            OptBtn.Text = "  " .. tostring(option)
+            OptBtn.TextColor3 = Selected[option] and Color3.fromRGB(255, 177, 24) or Color_Text
             OptBtn.TextXAlignment = Enum.TextXAlignment.Left
             OptBtn.Font = Enum.Font.Code
             OptBtn.TextSize = 11
@@ -1663,17 +1800,16 @@ end
 
             OptBtn.MouseButton1Click:Connect(function()
                 if not isMulti then
-                    local was = Selected[option]
+                    local isAlreadySelected = Selected[option]
                     Selected = {}
-                    if not was then Selected[option] = true end
+                    if not isAlreadySelected then
+                        Selected[option] = true
+                    end
                 else
                     Selected[option] = not Selected[option]
                 end
 
-                for opt, btn in pairs(OptionButtons) do
-                    btn.BackgroundColor3 = Selected[opt] and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(35, 35, 35)
-                    btn.TextColor3 = Selected[opt] and Color3.fromRGB(255, 0, 0) or Color_Text
-                end
+                RefreshVisuals()
 
                 local tbl = {}
                 for k, v in pairs(Selected) do if v then table.insert(tbl, k) end end
@@ -1682,18 +1818,16 @@ end
 
             OptionButtons[option] = OptBtn
         end
-
-        OptionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
     end
-
-    Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        OptionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
-    end)
 
     SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
         local text = SearchBox.Text:lower()
         for opt, btn in pairs(OptionButtons) do
-            btn.Visible = (text == "" or opt:lower():find(text, 1, true)) and true or false
+            if text == "" or opt:lower():find(text) then
+                btn.Visible = true
+            else
+                btn.Visible = false
+            end
         end
     end)
 
@@ -1723,17 +1857,22 @@ end
             for k, v in pairs(Selected) do if v then table.insert(tbl, k) end end
             return tbl
         end,
-        Update = function(self, NewOptions, NewDefault)
-            Options = NewOptions or Options
+        Update = function(NewOptions, NewDefault)
+            Options = NewOptions or {}
             Selected = {}
             if NewDefault then
-                for _, v in pairs(NewDefault) do Selected[tostring(v)] = true end
+                for _, v in pairs(NewDefault) do Selected[v] = true end
             end
             SearchBox.Text = ""
             RefreshOptions()
+            
+            local tbl = {}
+            for k, v in pairs(Selected) do if v then table.insert(tbl, k) end end
+            pcall(Callback, tbl)
         end
     }
 end
+
 function Elements:Tooltip(TargetFrame, Text)
     local TooltipFrame = Instance.new("Frame")
     local TooltipCorner = Instance.new("UICorner")
@@ -1985,6 +2124,145 @@ function Elements:Video(Configs)
         end
     }
 end
+function Elements:WelcomeCard(Configs)
+    local ImageId = Configs.Image or "rbxassetid://0"
+    local DiscordLink = Configs.Discord or ""
+    local MPS = game:GetService("MarketplaceService")
+    
+    local Frame = Instance.new("Frame")
+    Frame.Parent = Page
+    Frame.Size = UDim2.new(1, 0, 0, 180)
+    Frame.BackgroundColor3 = Color_Sec
+    Frame.BorderSizePixel = 0
+    Frame.ClipsDescendants = true
+    
+    local FrameCorner = Instance.new("UICorner")
+    FrameCorner.CornerRadius = UDim.new(0, 6)
+    FrameCorner.Parent = Frame
+    
+    local FrameStroke = Instance.new("UIStroke")
+    FrameStroke.Color = Color3.fromRGB(45, 45, 45)
+    FrameStroke.Thickness = 1
+    FrameStroke.Parent = Frame
+
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Parent = Frame
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Size = UDim2.new(1, -60, 0, 20)
+    TitleLabel.Position = UDim2.new(0, 10, 0, 10)
+    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.Text = "• Loading..."
+    TitleLabel.TextColor3 = Color_Text
+    TitleLabel.TextSize = 14
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    
+    local DiscordBtn = Instance.new("ImageButton")
+    DiscordBtn.Parent = Frame
+    DiscordBtn.BackgroundTransparency = 1
+    DiscordBtn.Size = UDim2.new(0, 20, 0, 20)
+    DiscordBtn.Position = UDim2.new(1, -30, 0, 10)
+    DiscordBtn.Image = "rbxassetid://12058969086"
+    DiscordBtn.ImageColor3 = Color_Text
+
+    if DiscordLink ~= "" then
+        DiscordBtn.MouseButton1Click:Connect(function()
+            if setclipboard then setclipboard(DiscordLink) end
+        end)
+    else
+        DiscordBtn.Visible = false
+    end
+    
+    local ImageFrame = Instance.new("Frame")
+    ImageFrame.Parent = Frame
+    ImageFrame.Size = UDim2.new(1, -30, 0, 100)
+    ImageFrame.Position = UDim2.new(0, 15, 0, 35)
+    ImageFrame.BackgroundColor3 = Color_Main
+    ImageFrame.BorderSizePixel = 0
+    
+    local ImageCorner = Instance.new("UICorner")
+    ImageCorner.CornerRadius = UDim.new(0, 6)
+    ImageCorner.Parent = ImageFrame
+    
+    local DisplayImage = Instance.new("ImageLabel")
+    DisplayImage.Parent = ImageFrame
+    DisplayImage.Size = UDim2.new(1, 0, 1, 0)
+    DisplayImage.BackgroundTransparency = 1
+    DisplayImage.Image = ImageId
+    DisplayImage.ScaleType = Enum.ScaleType.Crop
+    
+    local ImgCorner = Instance.new("UICorner")
+    ImgCorner.CornerRadius = UDim.new(0, 6)
+    ImgCorner.Parent = DisplayImage
+
+    local WelcomeFrame = Instance.new("Frame")
+    WelcomeFrame.Parent = Frame
+    WelcomeFrame.Size = UDim2.new(1, -30, 0, 35)
+    WelcomeFrame.Position = UDim2.new(0, 15, 0, 140)
+    WelcomeFrame.BackgroundColor3 = Color_Main
+    WelcomeFrame.BorderSizePixel = 0
+    
+    local WelcomeCorner = Instance.new("UICorner")
+    WelcomeCorner.CornerRadius = UDim.new(0, 6)
+    WelcomeCorner.Parent = WelcomeFrame
+    
+    local WelcomeLabel = Instance.new("TextLabel")
+    WelcomeLabel.Parent = WelcomeFrame
+    WelcomeLabel.BackgroundTransparency = 1
+    WelcomeLabel.Size = UDim2.new(1, -10, 0, 18)
+    WelcomeLabel.Position = UDim2.new(0, 10, 0, 2)
+    WelcomeLabel.Font = Enum.Font.GothamBold
+    WelcomeLabel.Text = "Welcome"
+    WelcomeLabel.TextColor3 = Color_Text
+    WelcomeLabel.TextSize = 13
+    WelcomeLabel.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local NameLabel = Instance.new("TextLabel")
+    NameLabel.Parent = WelcomeFrame
+    NameLabel.BackgroundTransparency = 1
+    NameLabel.Size = UDim2.new(1, -10, 0, 14)
+    NameLabel.Position = UDim2.new(0, 10, 0, 18)
+    NameLabel.Font = Enum.Font.Gotham
+    NameLabel.TextColor3 = Color_TextDim
+    NameLabel.TextSize = 11
+    NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- جلب اسم الـ Executor
+    local ExecutorName = "Unknown"
+    if identifyexecutor then
+        ExecutorName = identifyexecutor()
+    elseif getexecutorname then
+        ExecutorName = getexecutorname()
+    end
+
+    -- تحديث FPS كل ثانية
+    task.spawn(function()
+        while NameLabel.Parent do
+            local fps = math.floor(1 / game:GetService("RunService").RenderStepped:Wait())
+            NameLabel.Text = "Executor: " .. ExecutorName .. " | FPS: " .. fps
+            task.wait(0.5)
+        end
+    end)
+
+    -- جلب اسم اللعبة وصورتها
+    task.spawn(function()
+        local ok, info = pcall(function()
+            return MPS:GetProductInfo(game.PlaceId)
+        end)
+        
+        if ok and info then
+            TitleLabel.Text = "• " .. info.Name
+            
+            if info.IconImageAssetId and info.IconImageAssetId > 0 then
+                DisplayImage.Image = "rbxassetid://" .. info.IconImageAssetId
+            else
+                DisplayImage.Image = "rbxthumb://type=GameIcon&id=" .. game.PlaceId .. "&w=420&h=420"
+            end
+        else
+            TitleLabel.Text = "• Unknown Game"
+            DisplayImage.Image = "rbxthumb://type=GameIcon&id=" .. game.PlaceId .. "&w=420&h=420"
+        end
+    end)
+end
             function Elements:State(text)
                 local Lab = Instance.new("TextLabel")
                 local LabCorner = Instance.new("UICorner")
@@ -2142,7 +2420,7 @@ end
         if Listening then return end
         Listening = true
         BindBtn.Text = "..."
-        BindBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
+        BindBtn.TextColor3 = Color3.fromRGB(255, 177, 24)
     end)
 
     game:GetService("UserInputService").InputBegan:Connect(function(input, gpe)
@@ -2172,7 +2450,7 @@ end
 end
     function Elements:ColorPicker(Configs)
     local name = Configs.Title or "Color Picker"
-    local Default = Configs.Default or Color3.fromRGB(255, 0, 0)
+    local Default = Configs.Default or Color3.fromRGB(255, 177, 24)
     local Callback = Configs.Callback or function() end
     
     local ColorH, ColorS, ColorV = Color3.toHSV(Default)
@@ -2363,7 +2641,7 @@ end
     local function ToggleRainbow(State)
         IsRainbow = State
         if IsRainbow then
-            RainbowToggle.TextColor3 = Color3.fromRGB(255, 0, 0)
+            RainbowToggle.TextColor3 = Color3.fromRGB(255, 177, 24)
             
             RainbowConnection = game:GetService("RunService").RenderStepped:Connect(function()
                 local Hue = (tick() % 5) / 5
@@ -2466,5 +2744,3 @@ end
 
     return Lib
 end)()
-
-return Library
