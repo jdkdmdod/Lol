@@ -1,4 +1,5 @@
 local Library = (function()
+    local Library = (function()
     pcall(function()
         if game:GetService('CoreGui'):FindFirstChild('HexHubX') then
             game:GetService('CoreGui'):FindFirstChild('HexHubX'):Destroy()
@@ -54,11 +55,11 @@ local Library = (function()
     Options = Color3.fromRGB(25, 25, 25),
     Stroke = Color3.fromRGB(255, 5, 5)
 },
-    ["Halloween"] = {
+    ["Christmas"] = {
     Hub = Color3.fromRGB(10, 10, 10),
     Options = Color3.fromRGB(25, 25, 25),
-    Stroke = Color3.fromRGB(255, 117, 24)
-},
+    Stroke = Color3.fromRGB(255, 5, 5)
+}, 
     ["Blue"] = {
         Hub = Color3.fromRGB(10, 15, 40),
         Options = Color3.fromRGB(15, 25, 60),
@@ -156,7 +157,7 @@ local Library = (function()
     }
 }
 
-    local CurrentTheme = Colors["Halloween"]
+    local CurrentTheme = Colors["Christmas"]
 
     function Lib:ApplyColor(colorName)
         local color = Colors[colorName]
@@ -549,9 +550,9 @@ ToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
 ToggleGradient.Parent = ToggleStroke
 ToggleGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 117, 24)),
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 5, 5)),
 ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
-ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 117, 24))
+ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 5, 5))
 })
 ToggleGradient.Rotation = 45
 
@@ -598,9 +599,9 @@ MainStroke.Transparency = 1
 
 MainGradient.Parent = MainStroke
 MainGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 117, 24)),
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 5, 5)),
 ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
-ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 117, 24))
+ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 5, 5))
 })
 MainGradient.Rotation = 45
 
@@ -705,7 +706,7 @@ end)
         local Snow = Instance.new("TextLabel")
         Snow.Parent = SnowContainer
         Snow.BackgroundTransparency = 1
-        Snow.Text = "🎃"
+        Snow.Text = "❄"
         Snow.TextColor3 = Color3.fromRGB(255, 255, 255)
         Snow.TextSize = math.random(8, 14)
         Snow.Font = Enum.Font.GothamBold
@@ -2862,4 +2863,6 @@ end
 
     return Lib
 end)()
+
 return Library
+end)()
