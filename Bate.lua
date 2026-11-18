@@ -550,7 +550,7 @@ ToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
 ToggleGradient.Parent = ToggleStroke
 ToggleGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 5, 5)),
+ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 5, 5)),
 ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
 ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 5, 5))
 })
