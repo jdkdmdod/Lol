@@ -1,5 +1,4 @@
 local Library = (function()
-    local Library = (function()
     pcall(function()
         if game:GetService('CoreGui'):FindFirstChild('HexHubX') then
             game:GetService('CoreGui'):FindFirstChild('HexHubX'):Destroy()
@@ -2862,7 +2861,4 @@ end
     end
 
     return Lib
-end)()
-
-return Library
 end)()
