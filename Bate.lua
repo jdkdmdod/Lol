@@ -54,11 +54,12 @@ local Library = (function()
     Options = Color3.fromRGB(25, 25, 25),
     Stroke = Color3.fromRGB(255, 5, 5)
 },
+ 
     ["Christmas"] = {
     Hub = Color3.fromRGB(10, 10, 10),
     Options = Color3.fromRGB(25, 25, 25),
-    Stroke = Color3.fromRGB(255, 5, 5)
-}, 
+    Stroke = Color3.fromRGB(255, 117, 24)
+},
     ["Blue"] = {
         Hub = Color3.fromRGB(10, 15, 40),
         Options = Color3.fromRGB(15, 25, 60),
@@ -549,9 +550,9 @@ ToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
 ToggleGradient.Parent = ToggleStroke
 ToggleGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 5, 5)),
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 117, 24)),
 ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
-ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 5, 5))
+ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 117, 24))
 })
 ToggleGradient.Rotation = 45
 
@@ -598,9 +599,9 @@ MainStroke.Transparency = 1
 
 MainGradient.Parent = MainStroke
 MainGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 5, 5)),
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 117, 24)),
 ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
-ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 5, 5))
+ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 117, 24))
 })
 MainGradient.Rotation = 45
 
@@ -691,6 +692,7 @@ end)
             TopIcon.Position = UDim2.new(0, GameTitle.Position.X.Offset + GameTitle.TextBounds.X + 8, 0.5, 0)
         end)
         
+        --[[
     local SnowContainer = Instance.new("Frame")
     SnowContainer.Name = "Snow"
     SnowContainer.Parent = Top
@@ -705,7 +707,7 @@ end)
         local Snow = Instance.new("TextLabel")
         Snow.Parent = SnowContainer
         Snow.BackgroundTransparency = 1
-        Snow.Text = "❄"
+        Snow.Text = "🎃"
         Snow.TextColor3 = Color3.fromRGB(255, 255, 255)
         Snow.TextSize = math.random(8, 14)
         Snow.Font = Enum.Font.GothamBold
@@ -738,7 +740,7 @@ end)
             end
         end
     end)
-    
+    ]] 
 local TimePlayedLabel = Instance.new("TextLabel")
 TimePlayedLabel.Name = "TimePlayedLabel"
 TimePlayedLabel.Parent = Top
@@ -2862,3 +2864,4 @@ end
 
     return Lib
 end)()
+return Library
