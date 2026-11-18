@@ -58,7 +58,7 @@ local Library = (function()
     ["Christmas"] = {
     Hub = Color3.fromRGB(10, 10, 10),
     Options = Color3.fromRGB(25, 25, 25),
-    Stroke = Color3.fromRGB(255, 117, 24)
+    Stroke = Color3.fromRGB(255, 5, 5)
 },
     ["Blue"] = {
         Hub = Color3.fromRGB(10, 15, 40),
@@ -550,9 +550,9 @@ ToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
 ToggleGradient.Parent = ToggleStroke
 ToggleGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 117, 24)),
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 5, 5)),
 ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
-ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 117, 24))
+ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 5, 5))
 })
 ToggleGradient.Rotation = 45
 
@@ -599,9 +599,9 @@ MainStroke.Transparency = 1
 
 MainGradient.Parent = MainStroke
 MainGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 117, 24)),
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 5, 5)),
 ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
-ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 117, 24))
+ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 5, 5))
 })
 MainGradient.Rotation = 45
 
