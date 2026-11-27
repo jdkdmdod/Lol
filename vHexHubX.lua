@@ -1243,3 +1243,5 @@ ToggleBtn.MouseButton1Click:Connect(function()
         MainFrame.Visible = false
     end
 end)
+
+return Library
