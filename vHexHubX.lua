@@ -1181,53 +1181,6 @@ function Library:Window(Configs)
     return WindowObj
 end
 
-local Window = Library:Window({
-    Hub = {
-        Name = "HexHubX : V1.0.1 : Blox fruits",
-        By = "Yousef"
-    }
-})
-
-local Main = Window:Tab("Farm", true, "81872698913435")
-
-Main:Discord({
-    Name = "HexHubX Discord",
-    Link = "https://discord.gg/fvSjxZ2hdD",
-    Image = "rbxassetid://131261436842623"
-})
-
-local Settings = Window:Tab("Settings", false, "81872698913435")
-
-Settings:MultiDropdown({
-    Title = "Select Theme",
-    Options = {"Red", "Blue", "Green", "Purple", "Orange", "White"},
-    Default = {"Red"},
-    Multi = false,
-    Callback = function(Value)
-        local selectedColor = Value[1]
-        if selectedColor and Colors[selectedColor] then
-            CurrentAccent = Colors[selectedColor]
-            MainStroke.Color = CurrentAccent
-        end
-    end
-})
-
-Settings:Toggle("Anti-AFK", true, function(Value)
-    if Value then
-        local vu = game:GetService("VirtualUser")
-        game:GetService("Players").LocalPlayer.Idled:Connect(function()
-            vu:CaptureController()
-            vu:ClickButton2(Vector2.new())
-        end)
-    end
-end)
-
-Settings:Label("UI Options")
-
-Settings:Slider("UI Transparency", 0, 100, 30, function(Value)
-    MainFrame.BackgroundTransparency = Value / 100
-end)
-
 local ToggleBtn = Instance.new("TextButton")
 local ToggleCorner = Instance.new("UICorner")
 local ToggleStroke = Instance.new("UIStroke")
